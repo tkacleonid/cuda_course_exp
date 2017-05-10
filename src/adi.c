@@ -190,5 +190,5 @@ void adi()
     x_solve();
     y_solve();
     z_solve();
-    add();
+    add2();
 }
