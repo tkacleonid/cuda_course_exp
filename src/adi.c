@@ -16,6 +16,8 @@
 #define u(i, j, k, m) u[(i) * P_SIZE * P_SIZE * P_SIZE + (j) * P_SIZE * P_SIZE + (k) * P_SIZE + m]
 #define rhs(i, j, k, m) rhs[(i) * P_SIZE * P_SIZE * P_SIZE + (j) * P_SIZE * P_SIZE + (k) * P_SIZE + m]
 
+/*
+
 __global__ void xinvr_kernel(double *rho_i, double *us, double * vs, double * ws,
                              double * speed, double * qs, double * rhs, 
                              const int nx2, const int ny2, const int nz2, 
@@ -80,6 +82,7 @@ void xinvr2()
     if (timeron) timer_stop(t_txinvr);
 }
 
+*/
 
 void xinvr()
 {
@@ -94,34 +97,35 @@ void xinvr()
         {            
             for (i = 1; i <= nx2; i++)
             {
-                ru1 = rho_i[k][j][i];
-                uu = us[k][j][i];
-                vv = vs[k][j][i];
-                ww = ws[k][j][i];
-                ac = speed[k][j][i];
+                ru1 = rho_i(k,j,i);
+                uu = us(k,j,i);
+                vv = vs(k,j,i);
+                ww = ws(k,j,i);
+                ac = speed(k,j,i);
                 ac2inv = ac*ac;
 
-                r1 = rhs[k][j][i][0];
-                r2 = rhs[k][j][i][1];
-                r3 = rhs[k][j][i][2];
-                r4 = rhs[k][j][i][3];
-                r5 = rhs[k][j][i][4];
+                r1 = rhs(k,j,i,0);
+                r2 = rhs(k,j,i,1);
+                r3 = rhs(k,j,i,2);
+                r4 = rhs(k,j,i,3);
+                r5 = rhs(k,j,i,4);
 
-                t1 = c2 / ac2inv * (qs[k][j][i] * r1 - uu*r2 - vv*r3 - ww*r4 + r5);
+                t1 = c2 / ac2inv * (qs(k,j,i) * r1 - uu*r2 - vv*r3 - ww*r4 + r5);
                 t2 = bt * ru1 * (uu * r1 - r2);
                 t3 = (bt * ru1 * ac) * t1;
 
-                rhs[k][j][i][0] = r1 - t1;
-                rhs[k][j][i][1] = -ru1 * (ww*r1 - r4);
-                rhs[k][j][i][2] = ru1 * (vv*r1 - r3);
-                rhs[k][j][i][3] = -t2 + t3;
-                rhs[k][j][i][4] = t2 + t3;
+                rhs(k,j,i,0) = r1 - t1;
+                rhs(k,j,i,1) = -ru1 * (ww*r1 - r4);
+                rhs(k,j,i,2) = ru1 * (vv*r1 - r3);
+                rhs(k,j,i,3) = -t2 + t3;
+                rhs(k,j,i,4) = t2 + t3;
             }
         }
     }
     if (timeron) timer_stop(t_txinvr);
 }
 
+/*
 
 __global__ void add_kernel(double *u, double *rhs, const int nx2, int ny2, int nz2)
 {
@@ -146,9 +150,9 @@ void add()
    // SAFE_CALL(cudaMemcpy(gpuU, u, sizeof(double) * P_SIZE * P_SIZE * P_SIZE * 5, cudaMemcpyHostToDevice));
    // SAFE_CALL(cudaMemcpy(gpuRhs, rhs, sizeof(double) * P_SIZE * P_SIZE * P_SIZE * 5, cudaMemcpyHostToDevice));
 
-    add_kernel<<<dim3(nx2/32 + 1, ny2/4 + 1, nz2), dim3(32, 4, 1)>>>(gpu_u, gpu_rhs, nx2, ny2, nz2);
+    add_kernel<<<dim3(nx2/32 + 1, ny2/4 + 1, nz2), dim3(32, 4, 1)>>>(g_u, g_rhs, nx2, ny2, nz2);
 
-    SAFE_CALL(cudaMemcpy(u, gpu_u, sizeof(double)*P_SIZE*P_SIZE*P_SIZE*5, cudaMemcpyDeviceToHost));
+    SAFE_CALL(cudaMemcpy(u, g_u, sizeof(double)*P_SIZE*P_SIZE*P_SIZE*5, cudaMemcpyDeviceToHost));
 
     if (timeron) timer_stop(t_add);
 }
@@ -163,6 +167,8 @@ void add()
 #undef u
 #undef rhs
 
+*/
+
 void add2()
 {
     int i, j, k, m;
@@ -172,7 +178,7 @@ void add2()
         for (j = 1; j <= ny2; j++) {
             for (i = 1; i <= nx2; i++) {
                 for (m = 0; m < 5; m++) {
-                    u[k][j][i][m] = u[k][j][i][m] + rhs[k][j][i][m];
+                    u(k,j,i,m) = u(k,j,i,m) + rhs(k,j,i,m);
                 }
             }
         }
@@ -184,10 +190,10 @@ void add2()
 
 void adi()
 {
-    compute_rhs();
+    compute_rhs(0);
     xinvr();
     x_solve();
     y_solve();
     z_solve();
-    add();
+    add2();
 }
