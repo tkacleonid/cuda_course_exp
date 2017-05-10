@@ -18,6 +18,18 @@
 
 
 
+
+#undef us
+#undef vs
+#undef ws
+#undef qs
+#undef rho_i
+#undef speed
+
+#undef u
+#undef rhs
+
+
 void xinvr()
 {
     int i, j, k;
@@ -59,18 +71,6 @@ void xinvr()
     if (timeron) timer_stop(t_txinvr);
 }
 
-
-
-
-#undef us
-#undef vs
-#undef ws
-#undef qs
-#undef rho_i
-#undef speed
-
-#undef u
-#undef rhs
 
 void add2()
 {
