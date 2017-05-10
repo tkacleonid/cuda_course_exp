@@ -128,7 +128,7 @@ void xinvr()
     if (timeron) timer_stop(t_txinvr);
 }
 
-/*
+
 
 __global__ void add_kernel(double *u, double *rhs, const int nx2, int ny2, int nz2)
 {
@@ -160,6 +160,7 @@ void add()
     if (timeron) timer_stop(t_add);
 }
 
+/*
 #undef us
 #undef vs
 #undef ws
@@ -198,5 +199,5 @@ void adi()
     x_solve();
     y_solve();
     z_solve();
-    add2();
+    add();
 }
