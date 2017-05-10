@@ -1,9 +1,10 @@
 #include "header.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 //---------------------------------------------------------------------
 // compute the right hand side based on exact solution
 //---------------------------------------------------------------------
-#define forcing(i, j, k, m) forcing[(i) * P_SIZE * P_SIZE * P_SIZE + (j) * P_SIZE * P_SIZE + (k) * P_SIZE + m]
 
 void exact_rhs()
 {
@@ -262,5 +263,5 @@ void exact_rhs()
             }
         }
     }
+
 }
-#undef forcing

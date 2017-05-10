@@ -3,7 +3,12 @@
 //Trace flag
 #define TRACE true
 //Data class 
-#define CL 1
+#define CL 4
+
+//Block sizes
+#define BS1 32
+#define BS2 32
+#define BS3 1
 
 //DATA classes
 #if CL == 0

@@ -17,7 +17,7 @@ void verify(int no_time_steps, logical *verified)
     // compute the error norm and the residual norm, and exit if not printing
     //---------------------------------------------------------------------
     error_norm(xce);
-    compute_rhs();
+    compute_rhs(1);
     rhs_norm(xcr);
 
     for (m = 0; m < 5; m++)

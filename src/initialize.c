@@ -6,126 +6,106 @@
 // This subroutine initializes the field variable u using 
 // tri-linear transfinite interpolation of the boundary values     
 //---------------------------------------------------------------------
-#define u(i, j, k, m) u[(i) * P_SIZE * P_SIZE * P_SIZE + (j) * P_SIZE * P_SIZE + (k) * P_SIZE + m]
 void initialize()
 {
-    int i, j, k, m, ix, iy, iz;
-    double xi, eta, zeta, Pface[2][3][5], Pxi, Peta, Pzeta, temp[5];
-    
-    for (k = 0; k <= nz - 1; k++) 
-    {
-        for (j = 0; j <= ny - 1; j++) 
-        {
-            for (i = 0; i <= nx - 1; i++) 
-            {
-                u(k,j,i,0) = 1.0;
-                u(k,j,i,1) = 0.0;
-                u(k,j,i,2) = 0.0;
-                u(k,j,i,3) = 0.0;
-                u(k,j,i,4) = 1.0;
+    double Pface[2][3][5], Pxi, Peta, Pzeta, temp[5];
 
-                xi = i * dnxm1;
-                eta = j * dnym1;
-                zeta = k * dnzm1;
+    for (int k = 0; k < nz; ++k) {
+        for (int j = 0; j < ny; ++j) {
+            for (int i = 0; i < nx; ++i) {
+                u(k, j, i, 0) = 1.0;
+                u(k, j, i, 1) = 0.0;
+                u(k, j, i, 2) = 0.0;
+                u(k, j, i, 3) = 0.0;
+                u(k, j, i, 4) = 1.0;
 
-                for (ix = 0; ix < 2; ix++) 
-                {
+                double xi = i * dnxm1;
+                double eta = j * dnym1;
+                double zeta = k * dnzm1;
+
+                for (int ix = 0; ix < 2; ++ix) {
                     Pxi = ix;
                     exact_solution(Pxi, eta, zeta, &Pface[ix][0][0]);
                 }
 
-                for (iy = 0; iy < 2; iy++) 
-                {
+                for (int iy = 0; iy < 2; ++iy) {
                     Peta = iy;
                     exact_solution(xi, Peta, zeta, &Pface[iy][1][0]);
                 }
 
-                for (iz = 0; iz < 2; iz++) 
-                {
+                for (int iz = 0; iz < 2; ++iz) {
                     Pzeta = iz;
                     exact_solution(xi, eta, Pzeta, &Pface[iz][2][0]);
                 }
 
-                for (m = 0; m < 5; m++)
-                {
+                for (int m = 0; m < 5; ++m) {
                     Pxi = xi * Pface[1][0][m] + (1.0 - xi) * Pface[0][0][m];
                     Peta = eta * Pface[1][1][m] + (1.0 - eta) * Pface[0][1][m];
                     Pzeta = zeta * Pface[1][2][m] + (1.0 - zeta) * Pface[0][2][m];
 
-                    u(k,j,i,m) = Pxi + Peta + Pzeta - Pxi*Peta - Pxi*Pzeta - Peta*Pzeta + Pxi*Peta*Pzeta;
+                    u(k, j, i, m) = Pxi + Peta + Pzeta - Pxi*Peta - Pxi*Pzeta - Peta*Pzeta + Pxi*Peta*Pzeta;
                 }
 
-                if (i == 0)
-                {
+                if (i == 0) {
                     xi = 0.0;
                     eta = j * dnym1;
                     zeta = k * dnzm1;
-                    
+
                     exact_solution(xi, eta, zeta, temp);
 
-                    for (m = 0; m < 5; m++)
-                        u(k,j,i,m) = temp[m];
-                }
-                else if (i == nx - 1)
-                {
+                    for (int m = 0; m < 5; ++m)
+                        u(k, j, i, m) = temp[m];
+                } else if (i == nx - 1) {
                     xi = 1.0;
                     eta = j * dnym1;
                     zeta = k * dnzm1;
 
                     exact_solution(xi, eta, zeta, temp);
-                 
-                    for (m = 0; m < 5; m++)
-                        u(k,j,i,m) = temp[m];
-                }
-                else if (j == 0)
-                {
+
+                    for (int m = 0; m < 5; ++m)
+                        u(k, j, i, m) = temp[m];
+                } else if (j == 0) {
                     xi = i * dnxm1;
                     eta = 0.0;
                     zeta = k * dnzm1;
 
                     exact_solution(xi, eta, zeta, temp);
-                   
-                    for (m = 0; m < 5; m++)
-                        u(k,j,i,m) = temp[m];
-                }
-                else if (j == ny - 1)
-                {
+
+                    for (int m = 0; m < 5; ++m)
+                        u(k, j, i, m) = temp[m];
+                } else if (j == ny - 1) {
                     xi = i * dnxm1;
                     eta = 1.0;
                     zeta = k * dnzm1;
 
                     exact_solution(xi, eta, zeta, temp);
-                  
-                    for (m = 0; m < 5; m++)
-                        u(k,j,i,m) = temp[m];
-                }
-                else if (k == 0)
-                {
+
+                    for (int m = 0; m < 5; ++m)
+                        u(k, j, i, m) = temp[m];
+                } else if (k == 0) {
                     xi = i * dnxm1;
                     eta = j * dnym1;
                     zeta = 0.0;
 
                     exact_solution(xi, eta, zeta, temp);
 
-                    for (m = 0; m < 5; m++)
-                        u(k,j,i,m) = temp[m];
-                }
-                else if (k == nz - 1)
-                {
+                    for (int m = 0; m < 5; ++m)
+                        u(k, j, i, m) = temp[m];
+                } else if (k == nz - 1) {
                     xi = i * dnxm1;
                     eta = j * dnym1;
                     zeta = 1.0;
 
                     exact_solution(xi, eta, zeta, temp);
 
-                    for (m = 0; m < 5; m++)
-                        u(k,j,i,m) = temp[m];
+                    for (int m = 0; m < 5; ++m)
+                        u(k, j, i, m) = temp[m];
                 }
             }
         }
     }
+
 }
-#undef u
 
 logical inittrace(const char** t_names)
 {
@@ -155,10 +135,10 @@ int initparameters(int argc, char **argv, int *niter)
     int OK = true;
 
     FILE *fp;
-    if ((fp = fopen("input.data", "r")) != NULL)
+    if ((fp = fopen("inpudata", "r")) != NULL)
     {
         int result = 0;
-        printf(" Reading from input file input.data\n");
+        printf(" Reading from input file inpudata\n");
         result = fscanf(fp, "%d", niter);
         while (fgetc(fp) != '\n');
         result = fscanf(fp, "%lf", &dt);
@@ -168,7 +148,7 @@ int initparameters(int argc, char **argv, int *niter)
     }
     else
     {
-        //printf(" No input file input.data. Using compiled defaults\n");
+        //printf(" No input file inpudata. Using compiled defaults\n");
         *niter = NITER_DEFAULT;
         dt = DT_DEFAULT;
         nx = P_SIZE;
@@ -198,24 +178,42 @@ int initparameters(int argc, char **argv, int *niter)
 
 int allocateArrays()
 {
-    u = (double *) malloc(sizeof(double) * nx * ny * nz * 5);
-    rhs = (double *) malloc(sizeof(double) * nx * ny * nz * 5);
-    forcing = (double *) malloc(sizeof(double) * nx * ny * nz * 5);
+    size4 = sizeof(double) * nx * ny * nz * 5;
+    size3 = sizeof(double) * nx * ny * nz;
+    size2 = sizeof(double) * nx * 5;
 
-    size_t u_size = sizeof(double) * nx * ny * nz * 5;
-    size_t us_size = sizeof(double) * nx * ny * nz;
-    size_t pitch;
-    SAFE_CALL(cudaMalloc(&gpu_us, sizeof(double) * nx * ny * nz));
-    SAFE_CALL(cudaMalloc(&gpu_vs, sizeof(double) * nx * ny * nz));
-    SAFE_CALL(cudaMalloc(&gpu_ws, sizeof(double) * nx * ny * nz));
-    SAFE_CALL(cudaMalloc(&gpu_qs, sizeof(double) * nx * ny * nz));
-    SAFE_CALL(cudaMalloc(&gpu_rho_i, sizeof(double) * nx * ny * nz));
-    SAFE_CALL(cudaMalloc(&gpu_speed, sizeof(double) * nx * ny * nz));
-    SAFE_CALL(cudaMalloc(&gpu_square, sizeof(double) * nx * ny * nz));
-    SAFE_CALL(cudaMalloc(&gpu_u, sizeof(double) * nx * ny * nz * 5));
-    SAFE_CALL(cudaMalloc(&gpu_rhs, sizeof(double) * nx * ny * nz * 5));
-    SAFE_CALL(cudaMalloc(&gpu_forcing, sizeof(double) * nx * ny * nz * 5));
+    u = (double *) malloc(size4);
+    rhs = (double *) malloc(size4);
+    forcing = (double *) malloc(size4);
 
+    us = (double *) malloc(size3);
+    vs = (double *) malloc(size3);
+    ws = (double *) malloc(size3);
+    qs = (double *) malloc(size3);    
+    rho_i = (double *) malloc(size3);    
+    speed = (double *) malloc(size3);    
+    square = (double *) malloc(size3);   
+    
+    lhs_ = (double *) malloc(size4);    
+    lhsp_ = (double *) malloc(size4);    
+    lhsm_ = (double *) malloc(size4);    
+
+    SAFE_CALL(cudaMalloc(&g_u, size4));
+    SAFE_CALL(cudaMalloc(&g_rhs, size4));
+    SAFE_CALL(cudaMalloc(&g_forcing, size4));
+
+    SAFE_CALL(cudaMalloc(&g_us, size3));
+    SAFE_CALL(cudaMalloc(&g_vs, size3));
+    SAFE_CALL(cudaMalloc(&g_ws, size3));
+    SAFE_CALL(cudaMalloc(&g_qs, size3));
+    SAFE_CALL(cudaMalloc(&g_rho_i, size3));
+    SAFE_CALL(cudaMalloc(&g_speed, size3));
+    SAFE_CALL(cudaMalloc(&g_square, size3));
+
+    SAFE_CALL(cudaMalloc(&g_lhs_, size4));
+    SAFE_CALL(cudaMalloc(&g_lhsp_, size4));
+    SAFE_CALL(cudaMalloc(&g_lhsm_, size4));
+    
     return 1;
 }
 
@@ -225,17 +223,33 @@ int deallocateArrays()
     free(rhs);
     free(forcing);
 
-    SAFE_CALL(cudaFree(gpu_us));
-    SAFE_CALL(cudaFree(gpu_vs));
-    SAFE_CALL(cudaFree(gpu_ws));
-    SAFE_CALL(cudaFree(gpu_qs));
-    SAFE_CALL(cudaFree(gpu_rho_i));
-    SAFE_CALL(cudaFree(gpu_speed));
-    SAFE_CALL(cudaFree(gpu_square));
-    SAFE_CALL(cudaFree(gpu_u));
-    SAFE_CALL(cudaFree(gpu_rhs));
-    SAFE_CALL(cudaFree(gpu_forcing));
+    free(us);
+    free(vs);
+    free(ws);
+    free(qs);
+    free(rho_i);
+    free(speed);
+    free(square);
 
-    
+    free(lhs_);
+    free(lhsp_);
+    free(lhsm_);
+
+    SAFE_CALL(cudaFree(g_u));
+    SAFE_CALL(cudaFree(g_rhs));
+    SAFE_CALL(cudaFree(g_forcing));
+
+    SAFE_CALL(cudaFree(g_us));
+    SAFE_CALL(cudaFree(g_vs));
+    SAFE_CALL(cudaFree(g_ws));
+    SAFE_CALL(cudaFree(g_qs));
+    SAFE_CALL(cudaFree(g_rho_i));
+    SAFE_CALL(cudaFree(g_speed));
+    SAFE_CALL(cudaFree(g_square));
+
+    SAFE_CALL(cudaFree(g_lhs_));
+    SAFE_CALL(cudaFree(g_lhsp_));
+    SAFE_CALL(cudaFree(g_lhsm_));
+
     return 1;
 }

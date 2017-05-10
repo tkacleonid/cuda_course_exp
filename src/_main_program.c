@@ -26,27 +26,44 @@ double tx1, tx2, tx3, ty1, ty2, ty3, tz1, tz2, tz3,
        c2dtty1, c2dttz1, comz1, comz4, comz5, comz6, 
        c3c4tx3, c3c4ty3, c3c4tz3, c2iv, con43, con16;
 
-/* main arrays */
-double *u;
-double *rhs;
-double *forcing;
 
-double *gpu_u;
-double *gpu_rhs;
-double *gpu_forcing;
 
-double *gpu_us;
-double *gpu_vs;
-double *gpu_ws;
-double *gpu_qs;
-double *gpu_speed;
-double *gpu_square;
-double *gpu_rho_i;
+size_t size4 = sizeof(double) * nx * ny * nz * 5;
+size_t size3 = sizeof(double) * nx * ny * nz;
+size_t size2 = sizeof(double) * nx * 5;
 
-/* tmp arrays lhs */
-double lhs_ [P_SIZE][5];
-double lhsp_[P_SIZE][5];
-double lhsm_[P_SIZE][5];
+double* u;
+double* rhs;
+double* forcing;
+
+double* us;
+double* vs;
+double* ws;
+double* qs;
+double* rho_i;
+double* speed;
+double* square;
+
+double* lhs_ ;
+double* lhsp_;
+double* lhsm_;
+
+double* g_u;
+double* g_rhs;
+double* g_forcing;
+
+double* g_us;
+double* g_vs;
+double* g_ws;
+double* g_qs;
+double* g_rho_i;
+double* g_speed;
+double* g_square;
+
+double* g_lhs_ ;
+double* g_lhsp_;
+double* g_lhsm_;
+
 
 int main(int argc, char *argv[])
 {
@@ -75,12 +92,19 @@ int main(int argc, char *argv[])
 
     // main loop
     timer_start(t_total);
+
+    SAFE_CALL(cudaMemcpyAsync(g_forcing, forcing, size4, cudaMemcpyHostToDevice));
+    SAFE_CALL(cudaMemcpyAsync(g_u, u, size4, cudaMemcpyHostToDevice));
+
     for (step = 1; step <= niter; step++) 
     {
         if ( (step % 20) == 0 || step == 1)
             printf(" Time step %4d\n", step);
         adi();
     }
+
+    SAFE_CALL(cudaMemcpyAsync(u, g_u, size4, cudaMemcpyDeviceToHost));
+
     timer_stop(t_total);
     tmax = timer_read(t_total);
 
