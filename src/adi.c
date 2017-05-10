@@ -71,7 +71,7 @@ void add2()
 
 void adi()
 {
-    compute_rhs();
+    compute_rhs(0);
     xinvr();
     x_solve();
     y_solve();
