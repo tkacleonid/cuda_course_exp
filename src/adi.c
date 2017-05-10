@@ -122,19 +122,17 @@ void xinvr()
 
 
 
-__global__ void add_kernel(double *u, double *rhs, const int nx2, int ny2, int nz2)
+__global__ 
+void add_kernel(double *u, double *rhs, const int nx2, const int ny2, const int nz2)
 {
     int i = threadIdx.x + blockIdx.x * blockDim.x + 1;
     int j = threadIdx.y + blockIdx.y * blockDim.y + 1;
     int k = threadIdx.z + blockIdx.z * blockDim.z + 1;
- //printf("nx2 = %d, ny2 = %d, nz2 = %d\n", nx2, ny2, nz2);
+
     if (i <= nx2 && j <= ny2 && k <= nz2)
-    {
-        for (int m = 0; m < 5; m++) {
+        for (int m = 0; m < 5; m++)
             u(k,j,i,m) = u(k,j,i,m) + rhs(k,j,i,m);
- //printf ("u[%d][%d][%d][%d] = %f\n", k, i, j, m, u(k,j,i,m));
-        }
-    }
+
 }
 
 void add()
@@ -142,12 +140,13 @@ void add()
 
     if (timeron) timer_start(t_add);
 
-   // SAFE_CALL(cudaMemcpy(gpuU, u, sizeof(double) * P_SIZE * P_SIZE * P_SIZE * 5, cudaMemcpyHostToDevice));
-   // SAFE_CALL(cudaMemcpy(gpuRhs, rhs, sizeof(double) * P_SIZE * P_SIZE * P_SIZE * 5, cudaMemcpyHostToDevice));
+    SAFE_CALL(cudaMemcpy(g_u, u, size4, cudaMemcpyHostToDevice));
+    SAFE_CALL(cudaMemcpy(g_rhs, rhs, size4, cudaMemcpyHostToDevice));
+    
+    add_kernel<<<dim3(nx2/BS1 + 1, ny2/BS2 + 1 , nz2/BS3 + 1), dim3(BS1, BS2, BS3)>>>(g_u, g_rhs, nx2, ny2, nz2);
 
-    add_kernel<<<dim3(nx2/32 + 1, ny2/4 + 1, nz2), dim3(32, 4, 1)>>>(g_u, g_rhs, nx2, ny2, nz2);
+    SAFE_CALL(cudaMemcpy(u, g_u, size4, cudaMemcpyDeviceToHost));
 
-    SAFE_CALL(cudaMemcpy(u, g_u, sizeof(double)*P_SIZE*P_SIZE*P_SIZE*5, cudaMemcpyDeviceToHost));
 
     if (timeron) timer_stop(t_add);
 }
