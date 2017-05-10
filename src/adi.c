@@ -19,7 +19,7 @@
 
 */
 
-/*
+
 
 __global__ void xinvr_kernel(double *rho_i, double *us, double * vs, double * ws,
                              double * speed, double * qs, double * rhs, 
@@ -85,7 +85,7 @@ void xinvr2()
     if (timeron) timer_stop(t_txinvr);
 }
 
-*/
+
 
 void xinvr()
 {
@@ -195,7 +195,7 @@ void add2()
 void adi()
 {
     compute_rhs(0);
-    xinvr();
+    xinvr2();
     x_solve();
     y_solve();
     z_solve();
