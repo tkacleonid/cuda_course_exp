@@ -6,6 +6,7 @@
 // block-diagonal matrix-vector multiplication                  
 //---------------------------------------------------------------------
 
+/*
 #define us(i, j, k) us[(i) * P_SIZE * P_SIZE + (j) * P_SIZE + k]
 #define vs(i, j, k) vs[(i) * P_SIZE * P_SIZE + (j) * P_SIZE + k]
 #define ws(i, j, k) ws[(i) * P_SIZE * P_SIZE + (j) * P_SIZE + k]
@@ -15,6 +16,8 @@
 
 #define u(i, j, k, m) u[(i) * P_SIZE * P_SIZE * P_SIZE + (j) * P_SIZE * P_SIZE + (k) * P_SIZE + m]
 #define rhs(i, j, k, m) rhs[(i) * P_SIZE * P_SIZE * P_SIZE + (j) * P_SIZE * P_SIZE + (k) * P_SIZE + m]
+
+*/
 
 /*
 
