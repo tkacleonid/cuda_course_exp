@@ -7,16 +7,6 @@
 //---------------------------------------------------------------------
 
 
-#undef us
-#undef vs
-#undef ws
-#undef qs
-#undef rho_i
-#undef speed
-
-#undef u
-#undef rhs
-
 
 void xinvr()
 {
