@@ -191,4 +191,6 @@ void adi()
     y_solve();
     z_solve();
     add2();
+	SAFE_CALL(cudaMemcpy(g_u, u, size4, cudaMemcpyHostToDevice));
+    SAFE_CALL(cudaMemcpy(g_rhs, rhs, size4, cudaMemcpyHostToDevice));
 }
